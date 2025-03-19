@@ -13,3 +13,8 @@ class GetFinancesData:
         response = requests.get(f'{self.finance_base_url}/{date.today()}', params=base)
         data = pd.DataFrame.from_dict(response.json())
         return data
+    
+    def data_by_financial_dates(self, startDate, endDate, base):
+        response = requests.get(f'{self.finance_base_url}/{startDate}..{endDate}', params=base)
+        data = pd.DataFrame.from_dict(response.json())
+        return data

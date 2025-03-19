@@ -1,8 +1,8 @@
-from data_access.get_finances_data import GetFinancesData
+from feature.app import App
 
 def main():
-    data = GetFinancesData()
-    print(data.today_data_finance('BRL'))
+    renderDashboard = App()
+    renderDashboard.run()
 
 if __name__ == "__main__":
     main()
