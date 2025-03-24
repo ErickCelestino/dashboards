@@ -1,4 +1,5 @@
 import datetime
+import pandas as pd
 import streamlit as st
 from data_access.get_finances_data import GetFinancesData
 
@@ -22,7 +23,7 @@ class FinancesDashboard:
     def fetch_data(self):
         """Busca novos dados da API com as datas e moeda selecionadas."""
         self.data = self.finances_data.data_by_financial_dates(
-            self.last_fetched_start, self.last_fetched_end, self.last_fetched_currency
+            self.last_fetched_start, self.last_fetched_end, { "base": self.last_fetched_currency }
         )
 
     def setup_filters(self):
