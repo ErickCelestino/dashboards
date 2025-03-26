@@ -16,3 +16,9 @@ class GetFinancesData:
         df.index = pd.to_datetime(df.index, format='%Y-%m-%d')
         df.index =  df.index.strftime('%d/%m/%Y')
         return df
+
+    def data_currency_names(self):
+        response = requests.get(f'{self.finance_base_url}/currencies')
+        data = response.json()
+        df = pd.DataFrame.from_dict(data, orient="index")
+        return df.index
