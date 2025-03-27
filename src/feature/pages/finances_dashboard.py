@@ -1,5 +1,4 @@
 import datetime
-import pandas as pd
 import streamlit as st
 from data_access.get_finances_data import GetFinancesData
 from feature.data.finances_generate_charts import FinancesGenerateCharts
@@ -53,20 +52,22 @@ class FinancesDashboard:
             self.last_fetched_currency = self.currency
 
             self.fetch_data()
-
         self.filtered_data = self.data.copy()
     
     def render_layout(self):
         """Renders the filtered data on the screen."""
+        teste =  self.filtered_data
+
         charts = FinancesGenerateCharts(self.filtered_data, self.currency).generate_charts()
         tabHistory = st.tabs(['Histórico'])[0]
         with tabHistory:
             columnLeft, columnRight = st.columns(2)
             with columnLeft:
                 st.metric(self.ajust_metric_title('Cotação Dolar', 'USD'), charts['dolar_value'])
-            
+
             with columnRight:
                 st.metric(self.ajust_metric_title('Cotação Euro', 'EUR'), charts['euro_value'])
+
 
         st.dataframe(self.filtered_data, use_container_width=True)
 
