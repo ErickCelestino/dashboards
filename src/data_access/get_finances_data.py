@@ -16,7 +16,6 @@ class GetFinancesData:
 
         df['Data'] = pd.to_datetime(df['Data'])
         df['DiaMes'] = df['Data'].dt.strftime('%d/%m')
-        #df['Data'] = df['Data'].dt.strftime('%d/%m/%Y')
         
         id_vars = ['DiaMes', 'Data']
         value_vars = [col for col in df.columns if col not in id_vars]
