@@ -1,5 +1,6 @@
 import datetime
 import streamlit as st
+import plotly.express as px
 from data_access.get_finances_data import GetFinancesData
 from feature.data.finances_generate_charts import FinancesGenerateCharts
 
@@ -56,18 +57,21 @@ class FinancesDashboard:
     
     def render_layout(self):
         """Renders the filtered data on the screen."""
-        teste =  self.filtered_data
-
         charts = FinancesGenerateCharts(self.filtered_data, self.currency).generate_charts()
+        
         tabHistory = st.tabs(['Histórico'])[0]
         with tabHistory:
-            columnLeft, columnRight = st.columns(2)
-            with columnLeft:
-                st.metric(self.ajust_metric_title('Cotação Dolar', 'USD'), charts['dolar_value'])
+            col_metric1, col_metric2, col_metric3 = st.columns(3)
+            with col_metric1:
+                st.metric(self.ajust_metric_title('Dólar (USD)', 'USD'), charts['dolar_value'])
+            with col_metric2:
+                st.metric(self.ajust_metric_title('Euro (EUR)', 'EUR'), charts['euro_value'])
+            with col_metric3:
+                st.markdown(charts['last_date'], unsafe_allow_html=True)
 
-            with columnRight:
-                st.metric(self.ajust_metric_title('Cotação Euro', 'EUR'), charts['euro_value'])
+            st.plotly_chart(charts['fig_evolution_price_day'], use_container_width=True)
 
+            #columnLeft, columnRight = st.columns(2) .update_layout(autosize=True)
 
         st.dataframe(self.filtered_data, use_container_width=True)
 

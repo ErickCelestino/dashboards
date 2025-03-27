@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 import requests
 import pandas as pd
-from datetime import date
 
 class GetFinancesData:
     def __init__(self):
@@ -13,10 +12,13 @@ class GetFinancesData:
         response = requests.get(f'{self.finance_base_url}/{startDate}..{endDate}', params=params)
         data = response.json()
         df = pd.DataFrame.from_dict(data['rates'], orient="index").reset_index()
-        #df.index = pd.to_datetime(df.index, format='%Y-%m-%d')
-        #df.index =  df.index.strftime('%d/%m/%Y')
-        df['DiaMes'] = pd.to_datetime(df.index).strftime('%d/%m')
-        id_vars = ['DiaMes', 'index']
+        df.rename(columns={'index': 'Data'}, inplace=True)
+
+        df['Data'] = pd.to_datetime(df['Data'])
+        df['DiaMes'] = df['Data'].dt.strftime('%d/%m')
+        #df['Data'] = df['Data'].dt.strftime('%d/%m/%Y')
+        
+        id_vars = ['DiaMes', 'Data']
         value_vars = [col for col in df.columns if col not in id_vars]
         df = pd.melt(
             df,
