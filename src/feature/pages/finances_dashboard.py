@@ -1,6 +1,7 @@
 import datetime
 import streamlit as st
 import plotly.express as px
+
 from data_access.get_finances_data import GetFinancesData
 from feature.data.finances_generate_charts import FinancesGenerateCharts
 
@@ -71,7 +72,10 @@ class FinancesDashboard:
 
             st.plotly_chart(charts['fig_evolution_price_day'], use_container_width=True)
 
-            #columnLeft, columnRight = st.columns(2) .update_layout(autosize=True)
+            columnLeft = st.columns(2)[0]
+            with columnLeft:
+               st.plotly_chart(charts['fig_value_comparison'],  use_container_width=True)
+
 
         st.dataframe(self.filtered_data, use_container_width=True)
 

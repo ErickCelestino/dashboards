@@ -1,4 +1,5 @@
 import plotly.express as px
+import math
 
 class FinancesGenerateCharts:
     def __init__(self, data, currency):
@@ -27,15 +28,22 @@ class FinancesGenerateCharts:
             
         max_idx = filtered['Data'].idxmax()
         return filtered.loc[max_idx]['Valor']
-
-    def generate_charts(self):
+    
+    def generate_data(self):
         moedas=['BRL', 'EUR', 'USD', 'GBP']
-        df_sample = self.filtered_data[self.filtered_data['Moeda'].isin(moedas)]
+        self.df_sample = self.filtered_data[self.filtered_data['Moeda'].isin(moedas)]
+        self.value_comparion = self.filtered_data.groupby('Moeda')['Valor'].agg(['last']).reset_index()
         self.filtered_data = self.filtered_data.sort_values('Data')
 
+    def generate_charts(self):
+        self.generate_data()
         def create_line_chart(data, x, y, color, title, labels):
-            return px.line(data, x=x, y=y, markers=True, range_y=(0, data[y].max()), color=color, line_dash=color, title=title, labels=labels)
+            return px.line(data, x=x, y=y, markers=True, range_y=[0, data[y].max()], color=color, line_dash=color, title=title, labels=labels)
         
+        def create_bar_chart(data, x, y, title, yaxis_title):
+            return px.bar(data, x=x, y=y, text_auto=True, title=title, range_y=[0, math.ceil(data[y].mean())]).update_layout(yaxis_title=yaxis_title)
+
+
         return {
             "dolar_value": self.convert_currency(self.ajust_metric('USD'), 'USD'),
             "euro_value": self.convert_currency(self.ajust_metric('EUR'), 'EUR'),
@@ -51,11 +59,18 @@ class FinancesGenerateCharts:
                 </div>
                 """,
             "fig_evolution_price_day": create_line_chart(
-                df_sample, 
+                self.df_sample, 
                 x='DiaMes', 
                 y='Valor', 
                 color='Moeda',
                 title='Evolução das Cotações por Dia/Mês', 
                 labels={'Valor': 'Valor da Moeda', 'DiaMes': 'Dia/Mês'}
                 ),
+            "fig_value_comparison": create_bar_chart(
+                self.value_comparion,
+                x='Moeda',
+                y='last',
+                title='Comparação de preços',
+                yaxis_title='Preço'
+            )
         }
