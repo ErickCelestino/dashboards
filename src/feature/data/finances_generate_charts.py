@@ -31,22 +31,51 @@ class FinancesGenerateCharts:
     
     def generate_data(self):
         moedas=['BRL', 'EUR', 'USD', 'GBP']
+        last_month = self.filtered_data['Data'].max().month
+        
         self.filtered_data = self.filtered_data.sort_values('Data')
         self.df_sample = self.filtered_data[self.filtered_data['Moeda'].isin(moedas)]
-        
-        self.top_five_undervalued_currency = self.filtered_data.groupby('Moeda')['Valor'].agg(['last']).reset_index()
-        self.top_five_undervalued_currency = self.top_five_undervalued_currency.nlargest(5, "last")
+        df_last_month = self.filtered_data[self.filtered_data['Mes'] == last_month]
 
-        self.top_five_valued_currency = self.filtered_data.groupby('Moeda')['Valor'].agg(['last']).reset_index()
-        self.top_five_valued_currency = self.top_five_valued_currency.nsmallest(5, "last")
+        valued_currency = self.filtered_data.groupby('Moeda')['Valor'].agg(['last']).reset_index()
+        self.top_five_undervalued_currency = valued_currency.nlargest(5, "last")
+        self.top_five_valued_currency = valued_currency.nsmallest(5, "last")
+
+        self.week_average_currency = df_last_month.groupby(['Moeda', 'Mes', 'Semana'])['Valor'].mean().reset_index()
+        self.top_five_average_valued_currency = (
+            self.week_average_currency.groupby('Semana')
+            .apply(lambda x: x.nsmallest(5, 'Valor'))
+            .reset_index(drop=True)
+        )
+        self.top_five_average_undervalued_currency = (
+            self.week_average_currency.groupby('Semana')
+            .apply(lambda x: x.nlargest(5, 'Valor'))
+            .reset_index(drop=True)
+        )
 
     def generate_charts(self):
         self.generate_data()
         def create_line_chart(data, x, y, color, title, labels):
-            return px.line(data, x=x, y=y, markers=True, range_y=[0, data[y].max()], color=color, line_dash=color, title=title, labels=labels)
+            return px.line(data, 
+                           x=x, 
+                           y=y, 
+                           markers=True, 
+                           range_y=[0, data[y].max()], 
+                           color=color, line_dash=color, 
+                           title=title, 
+                           labels=labels)
         
-        def create_bar_chart(data, x, y, title, yaxis_title, orientation = 'v'):
-            return px.bar(data, x=x, y=y, orientation=orientation, text_auto=True, title=title, range_y=[0, math.ceil(data[y].mean())]).update_layout(yaxis_title=yaxis_title)
+        def create_bar_chart(data, x, y, title, yaxis_title, color=None, labels=None, orientation = 'v'):
+            return px.bar(data, 
+                          x=x, 
+                          y=y, 
+                          orientation=orientation, 
+                          labels=labels, 
+                          color=color, 
+                          text_auto=True, 
+                          title=title, 
+                          range_y=[0, math.ceil(data[y].mean())], 
+                          barmode='group').update_layout(yaxis_title=yaxis_title)
 
 
         return {
@@ -84,5 +113,25 @@ class FinancesGenerateCharts:
                 y='last',
                 title='Top 5 Moedas mais valorizadas',
                 yaxis_title='Preço'
+            ),
+            "fig_top_five_average_valued_currency": create_bar_chart(
+                self.top_five_average_valued_currency,
+                x='Valor',
+                y='Semana',
+                color='Moeda',
+                title='Top 5 Média das moedas mais valorizadas Mês Atual',
+                labels={'Valor': 'Média do Valor', 'Semana': 'Semana'},
+                orientation='h',
+                yaxis_title='Semana'
+            ),
+            "fig_top_five_average_undervalued_currency": create_bar_chart(
+                self.top_five_average_undervalued_currency,
+                x='Valor',
+                y='Semana',
+                color='Moeda',
+                title='Top 5 Média das moedas mais desvalorizadas Mês Atual',
+                labels={'Valor': 'Média do Valor', 'Semana': 'Semana'},
+                orientation='h',
+                yaxis_title='Semana'
             )
         }

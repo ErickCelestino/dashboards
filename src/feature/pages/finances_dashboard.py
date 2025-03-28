@@ -57,8 +57,6 @@ class FinancesDashboard:
     
     def render_layout(self):
         """Renders the filtered data on the screen."""
-        test = self.filtered_data.groupby('Moeda')['Valor'].agg(['last']).reset_index()
-        test = test.nsmallest(3, "last")
         charts = FinancesGenerateCharts(self.filtered_data, self.currency).generate_charts()
         
         tabHistory = st.tabs(['Histórico'])[0]
@@ -76,11 +74,10 @@ class FinancesDashboard:
             columnLeft, columnRight = st.columns(2)
             with columnLeft:
                st.plotly_chart(charts['fig_top_five_undervalued_currency'],  use_container_width=True)
+               st.plotly_chart(charts['fig_top_five_average_undervalued_currency'], use_container_width=True)
             with columnRight:
                st.plotly_chart(charts['fig_top_five_valued_currency'],  use_container_width=True)
-
-
-        st.dataframe(test, use_container_width=True)
+               st.plotly_chart(charts['fig_top_five_average_valued_currency'], use_container_width=True)
 
     def render_page(self):
         """Executes the dashboard page logic."""

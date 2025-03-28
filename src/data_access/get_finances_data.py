@@ -16,8 +16,10 @@ class GetFinancesData:
 
         df['Data'] = pd.to_datetime(df['Data'])
         df['DiaMes'] = df['Data'].dt.strftime('%d/%m')
+        df['Semana'] = (df['Data'].dt.day - 1) // 7 + 1
+        df['Mes'] = df['Data'].dt.month
         
-        id_vars = ['DiaMes', 'Data']
+        id_vars = ['DiaMes', 'Data', 'Semana', 'Mes']
         value_vars = [col for col in df.columns if col not in id_vars]
         df = pd.melt(
             df,
