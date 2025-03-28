@@ -83,7 +83,6 @@ class FinancesGenerateCharts:
             "euro_value": self.convert_currency(self.ajust_metric('EUR'), 'EUR'),
             "last_date": f"""
                 <div style="
-                    background-color: #f0f2f6;
                     padding: 8px;
                     border-radius: 5px;
                     text-align: center;
