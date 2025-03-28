@@ -1,12 +1,14 @@
 import streamlit as st
 from feature.pages.finances_dashboard import FinancesDashboard
+from feature.pages.stock_dashboard import StockDashboard
 
 class App:
     def __init__(self):
         st.set_page_config(page_title="Portifólio de Dados", layout="wide")
         self.pages = {
             "Página Principal": self.render_main_page,
-            "Dados Financeiros": FinancesDashboard().render_page
+            "Dados Financeiros": FinancesDashboard().render_page,
+            "Dados Estoque": StockDashboard().render_page
         }
 
     def render_main_page(self):
