@@ -13,5 +13,7 @@ class GetStockData:
         response = requests.get(f'{self.stock_base_url}')
         data = response.text
         df = pd.read_csv(StringIO(data), sep=";")
+        df['nom_municipio'] = df['nom_municipio'].str.strip()
+        df['nom_municipio'] = df['nom_municipio'].str.split('-', expand=True)[0]
         return df
 
